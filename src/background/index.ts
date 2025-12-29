@@ -1,6 +1,12 @@
-const MAX_LENGTH = 800;  // QR码实际容量限制
+const MAX_LENGTH = 800;
 const HISTORY_LIMIT = 20;
 
+interface HistoryItem {
+  text: string;
+  timestamp: number;
+}
+
+// Initialize context menu
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "generateQRCode",
@@ -9,8 +15,9 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+// Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "generateQRCode") {
+  if (info.menuItemId === "generateQRCode" && info.selectionText) {
     const selectedText = info.selectionText;
 
     if (selectedText.length > MAX_LENGTH) {
@@ -32,20 +39,24 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-function saveToHistory(text) {
+// Save to history
+function saveToHistory(text: string): void {
   chrome.storage.local.get(['history'], (result) => {
-    let history = result.history || [];
+    let history: HistoryItem[] = result.history || [];
     
+    // Remove existing item if present
     const existingIndex = history.findIndex(item => item.text === text);
     if (existingIndex !== -1) {
       history.splice(existingIndex, 1);
     }
     
+    // Add new item at the beginning
     history.unshift({
       text: text,
       timestamp: Date.now()
     });
     
+    // Keep only last 20 items
     if (history.length > HISTORY_LIMIT) {
       history = history.slice(0, HISTORY_LIMIT);
     }
@@ -53,3 +64,5 @@ function saveToHistory(text) {
     chrome.storage.local.set({ history: history });
   });
 }
+
+export {};
