@@ -9,11 +9,13 @@ interface QRCodePageProps {
 const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(true);
 
   useEffect(() => {
     if (!text) return;
 
     const generateQR = async () => {
+      setIsGenerating(true);
       try {
         if (canvasRef.current) {
           // Calculate parameters based on text length
@@ -37,12 +39,14 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
               light: '#ffffff'
             }
           });
+          setIsGenerating(false);
         }
       } catch (err) {
         const byteLength = new TextEncoder().encode(text).length;
         setError(`生成二维码失败：文本过长
 当前长度：${text.length}字符 (${byteLength}字节)
 建议减少文字或使用链接`);
+        setIsGenerating(false);
         console.error('QR Code generation failed:', err);
       }
     };
@@ -54,23 +58,125 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
 
   return (
     <div className="container active">
+      {/* Organic Blur Shapes with Animation */}
+      <div 
+        className="blur-shape blur-shape-primary floating" 
+        style={{ 
+          width: '250px', 
+          height: '250px', 
+          top: '-100px', 
+          left: '-100px'
+        }}
+        aria-hidden="true"
+      />
+      <div 
+        className="blur-shape blur-shape-tertiary floating-delayed" 
+        style={{ 
+          width: '180px', 
+          height: '180px', 
+          bottom: '-50px', 
+          right: '-50px'
+        }}
+        aria-hidden="true"
+      />
+
+
       <header>
-        <button className="back-btn" onClick={onBack}>
-          ← 返回
+        <button 
+          className="back-btn" 
+          onClick={onBack}
+          aria-label="返回主页"
+        >
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          </svg>
+          返回
         </button>
-        <h1>二维码</h1>
+        <h1 className="title-large">二维码</h1>
       </header>
 
-      <div className="card">
-        <div id="qrcode">
-          {error ? (
-            <div className="error" dangerouslySetInnerHTML={{ __html: error }} />
-          ) : (
-            <canvas ref={canvasRef} />
-          )}
-        </div>
-        {!error && <div className="text-preview">{previewText}</div>}
+      <div className="card" style={{ padding: '24px' }}>
+        {error ? (
+          <div className="error" dangerouslySetInnerHTML={{ __html: error }} />
+        ) : (
+          <>
+            <div id="qrcode" className={isGenerating ? 'loading' : ''}>
+              <canvas 
+                ref={canvasRef}
+                style={{
+                  display: isGenerating ? 'none' : 'block'
+                }}
+              />
+              {isGenerating && (
+                <div 
+                  className="loading-spinner"
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    border: '3px solid var(--md-surface-variant)',
+                    borderTop: '3px solid var(--md-primary)',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}
+                  aria-label="生成中..."
+                />
+              )}
+            </div>
+            
+            {!isGenerating && (
+              <>
+                <div className="text-preview">
+                  {previewText}
+                </div>
+
+                {/* Action Buttons */}
+                <div 
+                  className="button-group" 
+                  style={{ marginTop: '24px' }}
+                >
+                  <button 
+                    className="btn btn-tonal"
+                    onClick={() => {
+                      if (canvasRef.current) {
+                        canvasRef.current.toBlob((blob) => {
+                          if (blob) {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `qrcode-${Date.now()}.png`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }
+                        });
+                      }
+                    }}
+                    aria-label="下载二维码"
+                  >
+                    <svg 
+                      width="18" 
+                      height="18" 
+                      viewBox="0 0 24 24" 
+                      fill="currentColor"
+                      style={{ marginRight: '8px' }}
+                      aria-hidden="true"
+                    >
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    下载图片
+                  </button>
+                </div>
+              </>
+            )}
+          </>
+        )}
       </div>
+
     </div>
   );
 };
