@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface HomePageProps {
   onGenerateQR: (text: string) => void;
@@ -9,29 +9,38 @@ const HomePage: React.FC<HomePageProps> = ({ onGenerateQR, onNavigateToHistory }
   const [inputText, setInputText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     const text = inputText.trim();
     if (text) {
       onGenerateQR(text);
     }
-  };
+  }, [inputText, onGenerateQR]);
 
   const handleClear = () => {
     setInputText('');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      handleGenerate();
-    }
-  };
+  // Global keyboard listener for Ctrl+Enter
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && e.ctrlKey && inputText.trim()) {
+        e.preventDefault();
+        handleGenerate();
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [inputText, handleGenerate]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     setTimeout(() => {
       const value = e.currentTarget.value;
       if (value.length > 800) {
         setInputText(value.substring(0, 800));
-        alert('文本已截断至800个字符');
+        alert('Text truncated to 800 characters');
       }
     }, 10);
   };
@@ -76,9 +85,9 @@ const HomePage: React.FC<HomePageProps> = ({ onGenerateQR, onNavigateToHistory }
         <button 
           className="nav-btn" 
           onClick={onNavigateToHistory}
-          aria-label="查看历史记录"
+          aria-label="View history"
         >
-          历史记录
+          History
         </button>
       </header>
 
@@ -88,20 +97,19 @@ const HomePage: React.FC<HomePageProps> = ({ onGenerateQR, onNavigateToHistory }
             className={`text-field-label ${isFocused ? 'focused' : ''}`}
             htmlFor="text-input"
           >
-            输入或粘贴文本
+            Enter or paste text
           </label>
           <textarea
             id="text-input"
             className="text-field-input"
-            placeholder="请输入要生成二维码的文本（最多800字符）..."
+            placeholder="Enter text to generate QR code (max 800 characters)..."
             maxLength={800}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            onKeyDown={handleKeyDown}
             onPaste={handlePaste}
-            aria-label="输入文本"
+            aria-label="Input text"
             aria-describedby="text-counter"
           />
           <div 
@@ -123,17 +131,17 @@ const HomePage: React.FC<HomePageProps> = ({ onGenerateQR, onNavigateToHistory }
             className="btn btn-filled" 
             onClick={handleGenerate}
             disabled={!inputText.trim()}
-            aria-label="生成二维码"
+            aria-label="Generate QR code"
           >
-            生成二维码
+            Generate QR Code
           </button>
           <button 
             className="btn btn-tonal" 
             onClick={handleClear}
             disabled={!inputText}
-            aria-label="清空输入"
+            aria-label="Clear input"
           >
-            清空
+            Clear
           </button>
         </div>
       </div>
@@ -151,7 +159,7 @@ const HomePage: React.FC<HomePageProps> = ({ onGenerateQR, onNavigateToHistory }
           opacity: 0.9
         }}
       >
-        💡 提示：按 Ctrl+Enter 快速生成二维码
+        Tip: Press Ctrl+Enter to quickly generate QR code
       </div>
     </div>
   );

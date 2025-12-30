@@ -37,7 +37,7 @@ const App: React.FC = () => {
   const generateQRCode = (text: string) => {
     if (!text || text.length > 800) {
       if (text && text.length > 800) {
-        alert(`文本超过800个字符限制（当前：${text.length}个字符）`);
+        alert(`Text exceeds 800 character limit (current: ${text.length} characters)`);
       }
       return;
     }

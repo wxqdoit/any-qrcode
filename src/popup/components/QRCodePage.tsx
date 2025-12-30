@@ -43,9 +43,9 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
         }
       } catch (err) {
         const byteLength = new TextEncoder().encode(text).length;
-        setError(`生成二维码失败：文本过长
-当前长度：${text.length}字符 (${byteLength}字节)
-建议减少文字或使用链接`);
+        setError(`Failed to generate QR code: text too long
+Current length: ${text.length} characters (${byteLength} bytes)
+Consider reducing text or using a link`);
         setIsGenerating(false);
         console.error('QR Code generation failed:', err);
       }
@@ -85,7 +85,7 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
         <button 
           className="back-btn" 
           onClick={onBack}
-          aria-label="返回主页"
+          aria-label="Return to home"
         >
           <svg 
             width="20" 
@@ -96,9 +96,9 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
           >
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
-          返回
+          Back
         </button>
-        <h1 className="title-large">二维码</h1>
+        <h1 className="title-large">QR Code</h1>
       </header>
 
       <div className="card" style={{ padding: '24px' }}>
@@ -124,7 +124,7 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
                     borderRadius: '50%',
                     animation: 'spin 1s linear infinite'
                   }}
-                  aria-label="生成中..."
+                  aria-label="Generating..."
                 />
               )}
             </div>
@@ -156,7 +156,7 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
                         });
                       }
                     }}
-                    aria-label="下载二维码"
+                    aria-label="Download QR code"
                   >
                     <svg 
                       width="18" 
@@ -168,7 +168,7 @@ const QRCodePage: React.FC<QRCodePageProps> = ({ text, onBack }) => {
                     >
                       <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                     </svg>
-                    下载图片
+                    Download Image
                   </button>
                 </div>
               </>

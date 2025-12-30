@@ -18,11 +18,11 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
     if (diffDays === 0) {
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `今天 ${hours}:${minutes}`;
+      return `Today ${hours}:${minutes}`;
     } else if (diffDays === 1) {
-      return '昨天';
+      return 'Yesterday';
     } else if (diffDays < 7) {
-      return `${diffDays} 天前`;
+      return `${diffDays} days ago`;
     } else {
       const month = date.getMonth() + 1;
       const day = date.getDate();
@@ -64,7 +64,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
         <button 
           className="back-btn" 
           onClick={onBack}
-          aria-label="返回主页"
+          aria-label="Return to home"
         >
           <svg 
             width="20" 
@@ -75,15 +75,15 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
           >
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
-          返回
+          Back
         </button>
-        <h1 className="title-large">历史记录</h1>
+        <h1 className="title-large">History</h1>
       </header>
 
       <div className="card" style={{ padding: history.length === 0 ? '0' : '12px' }}>
         {history.length === 0 ? (
           <div className="empty-state">
-            暂无历史记录
+            No history yet
             <p 
               style={{ 
                 fontSize: '0.875rem', 
@@ -91,14 +91,14 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
                 opacity: 0.7
               }}
             >
-              生成的二维码将显示在这里
+              Generated QR codes will appear here
             </p>
           </div>
         ) : (
           <div 
             className="history-list"
             role="list"
-            aria-label="历史记录列表"
+            aria-label="History list"
           >
             {history.map((item, index) => (
               <div
@@ -112,7 +112,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
                     onSelectItem(item.text);
                   }
                 }}
-                aria-label={`生成 ${getDisplayText(item.text)} 的二维码`}
+                aria-label={`Generate QR code for ${getDisplayText(item.text)}`}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   {/* Icon */}
@@ -179,7 +179,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
           <button
             className="btn btn-text"
             onClick={() => {
-              if (confirm('确定要清空所有历史记录吗？')) {
+              if (confirm('Are you sure you want to clear all history?')) {
                 chrome.storage.local.remove(['history']);
                 window.location.reload();
               }
@@ -188,9 +188,9 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ history, onSelectItem, onBack
               color: 'var(--md-error)',
               fontSize: '0.875rem'
             }}
-            aria-label="清空历史记录"
+            aria-label="Clear history"
           >
-            清空历史记录
+            Clear History
           </button>
         </div>
       )}

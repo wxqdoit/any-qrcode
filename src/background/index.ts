@@ -10,7 +10,7 @@ interface HistoryItem {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "generateQRCode",
-    title: "生成二维码",
+    title: "Generate QR Code",
     contexts: ["selection"]
   });
 });
@@ -23,7 +23,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (selectedText.length > MAX_LENGTH) {
       chrome.storage.local.set({
         qrText: null,
-        error: `选中的文字超过${MAX_LENGTH}个字符限制（当前：${selectedText.length}个字符）`
+        error: `Selected text exceeds ${MAX_LENGTH} character limit (current: ${selectedText.length} characters)`
       }, () => {
         chrome.action.openPopup();
       });
