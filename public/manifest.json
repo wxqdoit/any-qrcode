@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Any QRCode",
-  "version": "1.0.0",
-  "description": "Generate QR codes from selected text",
+  "version": "1.0.1",
+  "description": "Generate QR codes from text",
   "permissions": ["contextMenus", "storage"],
   "background": {
     "service_worker": "background.js"
